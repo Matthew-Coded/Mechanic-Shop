@@ -1,0 +1,38 @@
+Mechanic
+    -id (PK)
+    -first_name 
+    -last_name 
+    -email 
+    -password 
+    -phone 
+    -address 
+    -dob 
+
+Customer 
+    -id (PK)
+    -first_name 
+    -last_name 
+    -email 
+    -password 
+    -phone 
+    -address 
+    -dob 
+
+Vehicle 
+    -id (PK)
+    -customer_id (FK -> Customer.id)
+    -make
+    -model 
+    -year 
+    -vin 
+
+Service_ticket 
+    -id (PK)
+    -customer_id (FK -> Customer.id)
+    -vehicle_id (FK -> Vehicle.id)
+    -service_reason
+
+Mechanic_Service_Ticket
+    -mechanic_id (FK -> Mechanic.id)
+    -service_ticket_id (FK -> Service_ticket.id)
+
