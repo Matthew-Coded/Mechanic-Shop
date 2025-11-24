@@ -1,6 +1,7 @@
 from flask import Flask
-from .extensions import db
+from .extensions import db, ma
 from .models import *
+from .blueprints.customer import customer_bp
 
 
 
@@ -11,8 +12,8 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    ma.init_app(app)
 
-    with app.app_context():
-        db.create_all()
+    app.register_blueprint(customer_bp, url_prefix="/customers")
 
     return app
