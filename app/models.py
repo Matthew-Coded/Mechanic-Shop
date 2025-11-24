@@ -1,8 +1,15 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, Date, ForeignKey
-from .extentions import db
-from datetime import date, datetime
+from sqlalchemy import String, Integer, Date, ForeignKey, Column, Table
+from .extensions import db
+from datetime import date
 
+
+mechanic_service_tickets = Table(
+    "mechanic_service_tickets",
+    db.metadata,
+    Column("mechanic_id", ForeignKey("mechanics.id"), primary_key=True),
+    Column("service_ticket_id", ForeignKey("service_tickets.id"), primary_key=True)
+)
 
 
 class Mechanic(db.Model):
@@ -17,6 +24,12 @@ class Mechanic(db.Model):
     address: Mapped[str] = mapped_column(String(500), nullable=False)
     dob: Mapped[date] = mapped_column(Date, nullable=True)
 
+    # Relationships
+    service_tickets: Mapped[list["ServiceTicket"]] = relationship(
+        secondary=mechanic_service_tickets,
+        back_populates="mechanics"
+    )
+
 
 class Customer(db.Model):
     __tablename__ = "customers"
@@ -28,7 +41,7 @@ class Customer(db.Model):
     password: Mapped[str] = mapped_column(String(150), nullable=False)
     phone: Mapped[str] = mapped_column(String(20), nullable=False)
     address: Mapped[str] = mapped_column(String(500), nullable=False)
-    dob: Mapped[Date] = mapped_column(Date, nullable=True)
+    dob: Mapped[date] = mapped_column(Date, nullable=True)
 
     # Relationship
     vehicles: Mapped[list["Vehicle"]] = relationship(
@@ -73,19 +86,9 @@ class ServiceTicket(db.Model):
     vehicle: Mapped["Vehicle"] = relationship(
         back_populates="service_tickets"
     )
-
-
-class MechanicServiceTicket(db.Model):
-    __tablename__ = "mechanic_service_tickets"
-
-    mechanic_id: Mapped[int] = mapped_column(
-        ForeignKey('mechanics.id'),
-        primary_key=True
-    )
-
-    service_ticket_id: Mapped[int] = mapped_column(
-        ForeignKey('service_tickets.id'),
-        primary_key=True
+    mechanics: Mapped[list["Mechanic"]] = relationship(
+        secondary=mechanic_service_tickets,
+        back_populates="service_tickets"
     )
 
 
