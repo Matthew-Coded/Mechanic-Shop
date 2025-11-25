@@ -1,0 +1,226 @@
+swagger: '2.0'
+info:
+  title: "Mechanic Shop API"
+  description: "Used to manage the everyday functionalities of the Mechanic Shop"
+  version: "0.0.1"
+
+host: "127.0.0.1:5000" # During development of my API served on my local host (Will change when we go to production)
+schemes:
+  - "http"
+consume:
+  - "application/json" # My API recieves json data
+produce:
+  - "application/json" # and produces json data
+
+securityDefinitions: # Describing how to add token auth to the endpoints
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+
+paths: # Information about our routes
+
+  /customers/login: # endpoint starts the path
+    post: # request type (post, get, put, delete)
+      tags:
+        - Customers # Add this route to a category
+      summary: "Login endpoint (generates a token)" # At a glance about the endpoint
+      description: "Validates user credentials (email and password), and produces a user specific token" # More in-depth info about the endpoint
+      parameters: # Info about the data being sent (DON'T WANT TO FORGET THE "S" IN parameters)
+        - in: "body" # Where will this info come from
+          name: "body"
+          description: "Login Credentials" # What are you sending
+          required: true
+          schema:
+            $ref: "#/definitions/LoginCredentials"
+      responses:
+        200:
+          description: "Login Successful"
+          schema:
+            $ref: "#/definitions/LoginResponse"
+          examples:
+            application/json:
+              message: "Welcome User"
+              token: "AWE445RT3WAT4R3ZEAY456876IYJD..."
+
+  /customers:
+    post: # Create User endpoint
+      tags:
+        - Customers
+      summary: "Register Customer"
+      description: "Send in customer info, to create a customer profile that will be stored in the database."
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "New Customer Information"
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerInput"
+
+      responses:
+        201:
+          description: "Creation Successful"
+          schema: "#/definitions/CustomerResponse"
+          examples:
+            application/json:
+              "address": "123 Test Street"
+              "dob": "2000-01-01"
+              "email": "John@example.com"
+              "first_name": "John"
+              "id": "1"
+              "last_name": "Doe"
+              "password": "<encrypted password>"
+              "phone": "555-555-5555"
+
+    get: # Get all users Endpoint
+        tags:
+          - Customers
+        summary: "Return all Customers"
+        description: "Endpoint to revieve an array of customer objects"
+        responses:
+          200:
+            description: "Successful Retrieval of Customers"
+            schema:
+              $ref: "#/definitions/CustomersResponse"
+
+    put: # Update a customer
+      tags:
+        - Customers
+      summary: "Update Customer Endpoint"
+      description: "Endpoint to update a customer, requires a token, user will be identified by the token"
+      security:
+        - bearerAuth: [] # Referencing our Token Auth definition (Make sure when authorizing in Swagger you add Bearer <token>)
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Customer Updates"
+        required: true
+        schema:
+          $ref: "#/definitions/CustomerInput"
+
+      responses:
+        201:
+          description: "Update Successful"
+          schema: "#/definitions/CustomerResponse"
+          examples:
+            application/json:
+              "address": "123 Test Street"
+              "dob": "2000-01-01"
+              "email": "John@example.com"
+              "first_name": "John"
+              "id": 0
+              "last_name": "Doe"
+              "password": "<encrypted password>"
+              "phone": "555-555-5555"
+
+    delete: # Delete a Customer
+      tags:
+        - Customers
+      summary: "Delete a customer"
+      description: " Delete a customer, requires a token, token will be used to identify user to delete."
+      security:
+        - bearer Auth: []
+      responses:
+        200:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+
+
+definitions: # Information about the shape of input and output json
+
+  LoginCredentials: # Input data required for login route
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+
+    required:
+      - email
+      - password
+
+  LoginResponse: #Response from /login endpoint
+    type: object
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+
+  CustomerInput: # Sending customer information
+    type: object
+    properties:
+      first_name:
+        type: string
+        example: "John"
+      last_name:
+        type: string
+        example: "Doe"
+      email:
+        type: string
+        example: "John@example.com"
+      password:
+        type: string
+        example: "12345"
+      phone:
+        type: string
+        example: "555-555-5555"
+      address:
+        type: string
+        example: "123 Test Street"
+      dob:
+        type: string
+        example: "2000-01-01"
+
+  CustomerResponse: # Review single Customer profile
+    type: object
+    properties:
+      address:
+        type: string
+      dob:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+
+    required:
+      - email
+      - password
+      - first_name
+      - last_name
+
+  CustomersResponse: #Revieve for multiple users
+    type: array
+    items:
+      type: object
+      properties:
+        address:
+          type: string
+        dob:
+          type: string
+        email:
+          type: string
+        first_name:
+          type: string
+        id:
+          type: integer
+        last_name:
+          type: string
+        password:
+          type: string
+        phone:
+          type: string
+
