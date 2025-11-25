@@ -26,13 +26,13 @@ def test_customer():
         }
     )
 
-# All Customers
+# Read All Customers
 @customer_bp.route("", methods=["GET"])
 def get_customers():
     customers = Customer.query.all()
     return customers_schema.jsonify(customers)
 
-# One Customer
+# Read One Customer
 @customer_bp.route("/<int:customer_id>", methods=["GET"])
 def get_customer(customer_id):
     customer = Customer.query.get_or_404(customer_id)
